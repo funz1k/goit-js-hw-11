@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-const BASE_URL = 'https://pixabay.com/api/'
-const API_KEY = '27788557-ef284ffc5471aee7171defc77'
+const BASE_URL = 'https://pixabay.com/api/';
+const API_KEY = '27788557-ef284ffc5471aee7171defc77';
 
 export default class ImageApiService {
     constructor() {
