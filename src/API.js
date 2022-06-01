@@ -1,11 +1,32 @@
-const URL = 'https://restcountries.com/v3.1/name'
+const axios = require('axios');
 
-export default function fetchCountry(name) {
-    return fetch(`${URL}/${name}?fields=name,capital,population,flags,languages`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.status);
-            }
-            return response.json()
-        })
+const BASE_URL = 'https://pixabay.com/api/'
+const API_KEY = '27788557-ef284ffc5471aee7171defc77'
+
+export default class ImageApiService {
+    constructor() {
+        this.searchQuery = '';
+        this.page = 1;
+    }
+    fetchImages() {
+        const URL = `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=40`;
+
+        return axios.get(URL);
+    }
+
+    incrementPage() {
+        this.page += 1
+    }
+
+    resetPage() {
+        this.page = 1
+    }
+
+    get query() {
+        return this.searchQuery;
+    }
+
+    set query(newQuery) {
+        this.searchQuery = newQuery
+    }
 }

@@ -21,3 +21,7 @@ body {
   line-height: 1.5;
 }
 
+.load-more {
+  display: inline-block;
+  margin-top: 50px;
+}
