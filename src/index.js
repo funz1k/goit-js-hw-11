@@ -28,6 +28,7 @@ const onSearchFormSubmit = (e) => {
     imageApiService.query = e.currentTarget.elements.searchQuery.value.trim()
 
     if (imageApiService.query === '') {
+        loadMore.hide()
         return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
     }
 
