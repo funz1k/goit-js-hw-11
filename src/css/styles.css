@@ -82,3 +82,8 @@ body {
 .load-more.is-hidden{
   display: none;
 }
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
