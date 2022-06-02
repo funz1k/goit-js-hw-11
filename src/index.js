@@ -34,14 +34,12 @@ const onSearchFormSubmit = (e) => {
     clearImagesContainer();
     imageApiService.resetPage();
     imageApiService.fetchImages().then(images => {
-
-        if (images.total === 0) {
-            return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-        }
-
         notify(images)
         renderImages(images)
         loadMoreBtn.show()
+    }).catch(error => {
+        loadMoreBtn.hide();
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
     })
     e.currentTarget.reset()
 }
