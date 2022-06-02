@@ -5,6 +5,7 @@ import ImageApiService from './API';
 import cardsTpl from "./templates/cards.hbs";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import LoadMoreBtn from "./load-more-btn.js";
 
 
 const refs = {
@@ -13,8 +14,13 @@ const refs = {
     loadMore: document.querySelector('.load-more')
 }
 
+
 const imageApiService = new ImageApiService();
-console.log(imageApiService);
+const loadMoreBtn = new LoadMoreBtn({
+    selector: '.load-more',
+    hidden: true,
+});
+
 
 const onSearchFormSubmit = (e) => {
     e.preventDefault()
@@ -27,28 +33,39 @@ const onSearchFormSubmit = (e) => {
 
     clearImagesContainer();
     imageApiService.resetPage();
-    imageApiService.fetchImages().then(renderImages)
+    imageApiService.fetchImages().then(images => {
+
+        if (images.total === 0) {
+            return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
+        }
+
+        notify(images)
+        renderImages(images)
+        loadMoreBtn.show()
+    })
     e.currentTarget.reset()
 }
 
-const renderImages = (images) => {
+const renderImages = ({ hits }) => {
 
-    if (images.data.total === 0) {
-        return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-    }
-    Notiflix.Notify.info(`Hooray! We found ${images.data.totalHits} images.`)
-    refs.imageList.insertAdjacentHTML('beforeend', cardsTpl(images.data.hits))
-    new SimpleLightbox('.gallery a', { overlayOpacity: 0.8, captionsData: 'alt', captionDelay: 250, showCounter: false });
+    refs.imageList.insertAdjacentHTML('beforeend', cardsTpl(hits))
+    new SimpleLightbox('.gallery a', { overlayOpacity: 0.8, captionsData: 'alt', captionDelay: 250 });
 }
 
 const onLoadMore = (e) => {
-    imageApiService.incrementPage()
-    imageApiService.fetchImages().then(renderImages)
+    imageApiService.fetchImages().then(renderImages).catch(error => {
+        Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
+        loadMoreBtn.hide()
+    })
 }
 
 const clearImagesContainer = () => {
     refs.imageList.innerHTML = ''
 }
 
-refs.loadMore.addEventListener('click', onLoadMore)
+const notify = ({ totalHits }) => {
+    Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`)
+}
+
+loadMoreBtn.refs.button.addEventListener('click', onLoadMore)
 refs.form.addEventListener('submit', onSearchFormSubmit)
