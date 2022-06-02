@@ -28,7 +28,6 @@ const onSearchFormSubmit = (e) => {
     imageApiService.query = e.currentTarget.elements.searchQuery.value.trim()
 
     if (imageApiService.query === '') {
-        loadMore.hide()
         return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
     }
 
@@ -56,7 +55,7 @@ const renderImages = ({ hits }) => {
 const onLoadMore = (e) => {
     imageApiService.fetchImages().then(renderImages).catch(error => {
         Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
-        loadMoreBtn.hide()
+        loadMoreBtn.hide();
     })
 }
 

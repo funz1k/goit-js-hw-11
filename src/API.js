@@ -15,6 +15,7 @@ export default class ImageApiService {
             if (response.status === 400 || response.data.hits.length === 0) {
                 throw new Error(response.status);
             }
+            console.log(response);
             return response;
         }).then(({ data }) => {
             this.incrementPage();
