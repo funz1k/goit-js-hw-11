@@ -7,18 +7,19 @@ export default class ImageApiService {
     constructor() {
         this.searchQuery = '';
         this.page = 1;
+        this.perPage = 40;
+        this.totalHits = 0;
     }
     fetchImages() {
-        const URL = `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=40`;
-
+        console.log(this);
+        const URL = `${BASE_URL}?key=${API_KEY}&q=${this.searchQuery}&image_type=photo&orientation=horizontal&safesearch=true&page=${this.page}&per_page=${this.perPage}`;
         return axios.get(URL).then(function (response) {
             if (response.status === 400 || response.data.hits.length === 0) {
                 throw new Error(response.status);
             }
-            console.log(response);
             return response;
         }).then(({ data }) => {
-            this.incrementPage();
+            // this.incrementPage();
             return data
         })
     }
@@ -30,7 +31,12 @@ export default class ImageApiService {
     resetPage() {
         this.page = 1
     }
-
+    qPages() {
+        return Math.ceil(this.totalHits / this.perPage) + 1
+    }
+    resetQPages() {
+        this.totalHits = 0;
+    }
     get query() {
         return this.searchQuery;
     }

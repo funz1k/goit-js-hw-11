@@ -11,9 +11,8 @@ import LoadMoreBtn from "./load-more-btn.js";
 const refs = {
     form: document.querySelector('.search-form'),
     imageList: document.querySelector('.gallery'),
-    loadMore: document.querySelector('.load-more')
-}
-
+    loadMore: document.querySelector('.load-more'),
+};
 
 const imageApiService = new ImageApiService();
 const loadMoreBtn = new LoadMoreBtn({
@@ -21,49 +20,61 @@ const loadMoreBtn = new LoadMoreBtn({
     hidden: true,
 });
 
-
 const onSearchFormSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    imageApiService.query = e.currentTarget.elements.searchQuery.value.trim()
+    imageApiService.query = e.currentTarget.elements.searchQuery.value.trim();
 
     if (imageApiService.query === '') {
-        return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-    }
+        return Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    };
 
     clearImagesContainer();
+
     imageApiService.resetPage();
+    imageApiService.resetQPages();
+
     imageApiService.fetchImages().then(images => {
-        notify(images)
-        renderImages(images)
-        loadMoreBtn.show()
+        notify(images);
+        renderImages(images);
+        loadMoreBtn.show();
+        imageApiService.totalHits = images.totalHits
     }).catch(error => {
         loadMoreBtn.hide();
-        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.')
-    })
-    e.currentTarget.reset()
+        Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    });
+
+    e.currentTarget.reset();
 }
 
 const renderImages = ({ hits }) => {
 
-    refs.imageList.insertAdjacentHTML('beforeend', cardsTpl(hits))
+    refs.imageList.insertAdjacentHTML('beforeend', cardsTpl(hits));
+
     new SimpleLightbox('.gallery a', { overlayOpacity: 0.8, captionsData: 'alt', captionDelay: 250 });
 }
 
 const onLoadMore = (e) => {
-    imageApiService.fetchImages().then(renderImages).catch(error => {
-        Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.")
+    imageApiService.fetchImages().then(images => {
+        imageApiService.incrementPage();
+
+        if (imageApiService.qPages() === imageApiService.page) {
+            loadMoreBtn.hide();
+        };
+        renderImages(images);
+    }).catch(error => {
+        Notiflix.Notify.failure("We're sorry, but you've reached the end of search results.");
         loadMoreBtn.hide();
-    })
+    });
 }
 
 const clearImagesContainer = () => {
-    refs.imageList.innerHTML = ''
+    refs.imageList.innerHTML = '';
 }
 
 const notify = ({ totalHits }) => {
-    Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`)
+    Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
 }
 
-loadMoreBtn.refs.button.addEventListener('click', onLoadMore)
-refs.form.addEventListener('submit', onSearchFormSubmit)
+loadMoreBtn.refs.button.addEventListener('click', onLoadMore);
+refs.form.addEventListener('submit', onSearchFormSubmit);
