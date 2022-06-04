@@ -56,7 +56,6 @@ const renderImages = ({ hits }) => {
 
 const onLoadMore = (e) => {
     imageApiService.fetchImages().then(images => {
-        imageApiService.incrementPage();
 
         if (imageApiService.qPages() === imageApiService.page) {
             loadMoreBtn.hide();

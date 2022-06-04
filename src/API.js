@@ -19,7 +19,7 @@ export default class ImageApiService {
             }
             return response;
         }).then(({ data }) => {
-            // this.incrementPage();
+            this.incrementPage();
             return data
         })
     }
